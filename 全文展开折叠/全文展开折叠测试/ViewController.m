@@ -11,7 +11,7 @@
 @interface ViewController () <cellDelegate,UITableViewDelegate, UITableViewDataSource>
 
 @property(nonatomic,strong) UITableView *testTBV;
-
+@property (nonatomic,strong) NSMutableArray *expandArray;
 @end
 
 static NSString *CellIdentifier = @"TableViewCell";
@@ -20,7 +20,7 @@ static NSString *CellIdentifier = @"TableViewCell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-   
+    self.expandArray = [NSMutableArray array];
     _testTBV = [[UITableView alloc]initWithFrame:self.view.bounds style:UITableViewStylePlain];
     _testTBV.delegate = self;
     _testTBV.dataSource = self;
@@ -40,44 +40,45 @@ static NSString *CellIdentifier = @"TableViewCell";
     TestCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
         
-        cell = [[[NSBundle mainBundle]loadNibNamed:@"TestCell" owner:self options:nil] lastObject];
+        cell = [[[NSBundle mainBundle]loadNibNamed:@"TestCell" owner:nil options:nil] lastObject];
     }
     
     cell.delegate = self;
     
-    cell.index = indexPath;
-    
     cell.button.tag = indexPath.row;
-
+    
     cell.testLabel.text =   [NSString stringWithFormat: @"第%ld行 ------ 全新的Quick Type功能发挥了Siri的人工智能属性，用户在输入的时候系统将自动提供输入建议。另外Siri自消息应用中的响应也更为智能，比如当有朋友询问“你在哪里”时Siri将自动提供位置信息，而当询问“John的邮件说写了什么”的时候Siri会自动搜索联系人信息。",indexPath.row];
     
-    //这种随机颜色，很难看ye
-    cell.backgroundColor = [UIColor colorWithRed:arc4random_uniform(255)/255.0 green:arc4random_uniform(255)/255.0 blue:arc4random_uniform(255)/255.0 alpha:1];
-    return cell;
+
+    //    cell.backgroundColor = [UIColor colorWithRed:arc4random_uniform(255)/255.0 green:arc4random_uniform(255)/255.0 blue:arc4random_uniform(255)/255.0 alpha:1];
     
+    if ( [self.expandArray containsObject: indexPath]) {
+        cell.testLabel.numberOfLines = 0;
+        [cell.button setTitle:@"收起" forState:UIControlStateNormal];
+    }else{
+        cell.testLabel.numberOfLines = 1;
+        [cell.button setTitle:@"展开" forState:UIControlStateNormal];
+    }
+    
+    
+    return cell;
 }
 
 
 -(void)reloadAtIndex:(NSInteger)row
 {
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
-    TestCell *cell = [self.testTBV cellForRowAtIndexPath:indexPath];
- 
-    for (id  view in cell.contentView.subviews) {
-        if ([view isKindOfClass:[UILabel class]]) {
-            UILabel *label = (UILabel *)view;
-            if (label.numberOfLines) {
-                  label.numberOfLines = 0;
-            }else{
-              label.numberOfLines = 1;
-            }
-          
-        }
+    
+    if ( [self.expandArray containsObject:indexPath]) {
+        [self.expandArray removeObject:indexPath];
+    }else{
+        [self.expandArray addObject:indexPath];
     }
+    
+    NSLog(@"count: %ld",self.expandArray.count);
+    
+    
     [self.testTBV reloadData];
-    NSLog(@"你选择了第%ld行",indexPath.row);
-    //我也不知道为什么用下面这一行✋
-//    [_testTBV reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
 }
 
 - (void)didReceiveMemoryWarning {

@@ -24,18 +24,8 @@
 
     // Configure the view for the selected state
 }
-- (IBAction)clickBtn:(UIButton *)sender {
- 
-//    self.open = ! self.open;
-//    if (self.open ) {
-//        _testLabel.numberOfLines = 1;
-//    }else
-//    {
-//        _testLabel.numberOfLines = 0;
-//    }
-    
-//    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:_testLabel.tag inSection:0];
-//    NSLog(@"%d --- %ld",self.open,_testLabel.tag);
+- (IBAction)clickBtn:(UIButton *)sender
+{
     if ([self.delegate respondsToSelector:@selector(reloadAtIndex:)]) {
         [self.delegate reloadAtIndex:sender.tag];
     }
